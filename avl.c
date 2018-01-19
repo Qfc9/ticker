@@ -12,6 +12,24 @@ struct _avl {
 static void _rebalance(avl **a);
 static void _rotate_left(struct _avl **a);
 static void _rotate_right(struct _avl **a);
+static void recurse_inorder(struct _avl *n, void (*func)(double *));
+void tree_inorder(struct _avl *t, void (*func)(double *));
+
+void tree_inorder(struct _avl *t, void (*func)(double *))
+{
+	recurse_inorder(t, func);
+}
+
+static void recurse_inorder(struct _avl *n, void (*func)(double *))
+{
+	if(!n) {
+		return;
+	}
+	recurse_inorder(n->left, func);
+	func(&n->data);
+	recurse_inorder(n->right, func);
+}
+
 
 avl *avl_create(void)
 {

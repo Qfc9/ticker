@@ -18,4 +18,6 @@ void avl_print(const avl *a);
 
 void avl_disassemble(avl *a);
 
+void tree_inorder(struct _avl *t, void (*func)(double *));
+
 #endif
