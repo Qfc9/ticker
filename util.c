@@ -1,9 +1,11 @@
 #include "util.h"
 
+#include <stdio.h>
+
 double centsToDollars(size_t cents)
 {
-    double dollars = 0;
-    dollars = cents/100;
+    double dollars = cents;
+    dollars = dollars/100;
     return dollars;
 }
 

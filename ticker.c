@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "util.h"
 #include "tree.h"
 
 void theFunc(double *d)
@@ -126,7 +127,7 @@ int main(int argc, char *argv[])
         //sscanf(data[n], "%s %lf", dd);
         //snprintf(dd, 10, "%lf ", data[n]);
         //printf("%s %lf %s\n", foo, dd, temp);
-        tree_insert(&market, foo, temp, dd);
+        tree_insert(&market, foo, temp, dollarsToCents(dd));
     }
 
     tree_print(market);
