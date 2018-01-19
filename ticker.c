@@ -110,21 +110,48 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    char tick[6];
-    strcpy(tick, "TESTTT");
-    char name[8];
-    strcpy(name, "The Test");
 
     tree *market = createTree();
 
+    // TODO Check for write $ amount
+    // TODO Skip bad lines
     for (unsigned int n = 0; n < sz; n++) 
     {
         double value = 0.0;
         char ticker[6];
         char name[64];
+        char buf[64];
+
+        int tracker = 0;
+        int tempTracker = 0;
+
         strcpy(name, "\0");
+        strcpy(buf, "\0");
         strcpy(ticker, "\0");
-        sscanf(data[n], "%5s %lf %63s", ticker, &value, name);
+
+
+        if(sscanf(data[n], "%5s %lf%n", ticker, &value, &tracker) != 2)
+        {
+            continue;
+        }
+
+        while(sscanf(data[n] + tracker, "%63s%n", buf, &tempTracker) > 0)
+        {
+            if((strlen(buf) + strlen(name)) <= 63)
+            {
+                strcat(name, buf);
+                strcat(name, " ");
+                tracker += tempTracker;
+
+            }
+            else
+            {
+                strncat(name, buf, 63 - strlen(name));
+                name[63] = '\0';
+                break;
+            }
+        }
+
         tree_insert(&market, ticker, name, dollarsToCents(value));
     }
 
