@@ -1,9 +1,13 @@
+#include <stdbool.h>
+#include <string.h>
+#include <ctype.h>
 #include "util.h"
+
 
 double centsToDollars(size_t cents)
 {
-    double dollars = 0;
-    dollars = cents/100;
+    double dollars = cents;
+    dollars = dollars/100;
     return dollars;
 }
 
@@ -12,4 +16,19 @@ size_t dollarsToCents(double dollars)
     size_t cents = 0;
     cents = dollars * 100;
     return cents;
+}
+
+bool invalidTicker(char *ticker)
+{
+    for(unsigned int i = 0; strlen(ticker) > i; i++)
+    {
+        if(isalnum(ticker[i]) == 0)
+        {
+            if(ticker[i] != '.' && ticker[i] != '-' && ticker[i] != '/')
+            {
+                return true;
+            }
+        }
+    }
+    return false;
 }

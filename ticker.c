@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
+#include "util.h"
 #include "tree.h"
 
 void theFunc(double *d)
@@ -109,24 +111,59 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    char tick[6];
-    strcpy(tick, "TESTTT");
-    char name[8];
-    strcpy(name, "The Test");
 
     tree *market = createTree();
 
+    // TODO Check for write $ amount
+    // TODO Skip bad lines
     for (unsigned int n = 0; n < sz; n++) 
     {
-        char foo[6];
-        double dd = 0.0;
-        char temp[64];
-        //snprintf(foo, 6, "%s ", data[n]);
-        sscanf(data[n], "%5s %lf %63s", foo, &dd, temp);
-        //sscanf(data[n], "%s %lf", dd);
-        //snprintf(dd, 10, "%lf ", data[n]);
-        //printf("%s %lf %s\n", foo, dd, temp);
-        tree_insert(&market, foo, temp, dd);
+        double value = 0.0;
+        char ticker[6];
+        char name[64];
+        char buf[64];
+
+        int tracker = 0;
+        int tempTracker = 0;
+
+        strcpy(name, "\0");
+        strcpy(buf, "\0");
+        strcpy(ticker, "\0");
+
+
+        if(sscanf(data[n], "%5s %lf%n", ticker, &value, &tracker) != 2)
+        {
+            continue;
+        }
+
+        if(value < 0.00 || value > 1000000.00)
+        {
+            continue;
+        }
+
+        if(invalidTicker(ticker))
+        {
+            continue;
+        }
+
+        while(sscanf(data[n] + tracker, "%63s%n", buf, &tempTracker) > 0)
+        {
+            if((strlen(buf) + strlen(name)) <= 63)
+            {
+                strcat(name, buf);
+                strcat(name, " ");
+                tracker += tempTracker;
+
+            }
+            else
+            {
+                strncat(name, buf, 63 - strlen(name));
+                name[63] = '\0';
+                break;
+            }
+        }
+
+        tree_insert(&market, ticker, name, dollarsToCents(value));
     }
 
     tree_print(market);

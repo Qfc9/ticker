@@ -1,10 +1,11 @@
 #ifndef util_H
- #define util_H
+#define util_H
 
-#include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
 
 double centsToDollars(size_t cents);
-
 size_t dollarsToCents(double dollars);
+bool invalidTicker(char *ticker);
 
 #endif
