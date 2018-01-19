@@ -13,7 +13,6 @@ static void _rebalance(avl **a);
 static void _rotate_left(struct _avl **a);
 static void _rotate_right(struct _avl **a);
 static void recurse_inorder(struct _avl *n, void (*func)(double *));
-void tree_inorder(struct _avl *t, void (*func)(double *));
 
 void tree_inorder(struct _avl *t, void (*func)(double *))
 {

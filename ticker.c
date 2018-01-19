@@ -10,7 +10,7 @@ void theFunc(double *d)
 
 int main(int argc, char *argv[])
 {
-    FILE *fp;
+    FILE *readFile;
 
     // Checking for valid amount for args
     if(argc != 2)
@@ -20,41 +20,98 @@ int main(int argc, char *argv[])
     }
 
     // Attemping to open the file given
-    fp = fopen(argv[1], "r");
-    if(fp == NULL)
+    readFile = fopen(argv[1], "r");
+    if(readFile == NULL)
     {
         fprintf(stderr, "Unable to open the file: %s\n", argv[1]);
         return 1;
     }
-    fclose(fp);
 
-    avl *temps = avl_create();
-    // No ABC :(
-    
-    avl_insert(&temps, 3.14);
-    avl_remove(&temps, 3.11, 0.1);
-    avl_insert(&temps, 2.71);
-    avl_insert(&temps, 1.71);
-    avl_insert(&temps, 0.71);
-    avl_insert(&temps, -1.71);
-    avl_insert(&temps, -2.66);
+    size_t sz=0;
+    size_t cap=4;
+    char **data = malloc(cap * sizeof(*data));
+    int storageMax = 64;
+    int counter = 0;
 
-    printf("%zu\n", avl_height(temps));
-    avl_print(temps);
+    char buf = fgetc(readFile);
+    while(buf != EOF)
+    {
+        char *storage = malloc(storageMax);
 
-    avl_insert(&temps, 0.0);
+        // Dynamicly allocating each line in the file as a string
+        while(buf != EOF && buf != 10)
+        {
 
-    printf("%zu\n", avl_height(temps));
-    avl_print(temps);
+            storage[counter] = buf;
 
-    avl_remove(&temps, 2.71, 0.1);
+            counter++;
+            buf = fgetc(readFile);
 
-    printf("%zu\n", avl_height(temps));
-    avl_print(temps);
+            // Allocating more memory for the line
+            if (counter >= storageMax - 1) {
+                storageMax *= 2;
+                void *tmp_data = realloc(storage, storageMax * sizeof(storage));
+                if (tmp_data) {
+                    storage = tmp_data;
+                } else {
+                     // Freeing mallocs
+                    for (unsigned int n = 0; n < sz; n++) 
+                    {
+                        free(data[n]);
+                    }
+                    free(data);
+                    // Closing opened files
+                    fclose(readFile);
+                    return 1;
+            }
+            }
+        }
 
-    printf("\n");
+        // Adding eaching line to an array
+        storage[counter] = '\0';
+        buf = fgetc(readFile);
+        counter = 0;
+        data[sz++] = storage;
+        // Allocating more memory for the array for lines
+        if (sz >= cap) {
+            cap *= 2;
+            void *tmp_data = realloc(data, cap * sizeof(*data));
+            if (tmp_data) {
+                data = tmp_data;
+            } else {
+                 // Freeing mallocs
+                for (unsigned int n = 0; n < sz; n++) 
+                {
+                    free(data[n]);
+                }
+                free(data);
+                // Closing opened files
+                fclose(readFile);
+                return 1;
+            }
+        }
+    }
 
-    tree_inorder(temps, theFunc);
 
-    avl_disassemble(temps);
+    // Closing the read file
+    fclose(readFile);
+
+    // Checking if file is null
+    if(sz == 0)
+    {
+        fprintf(stderr, "File is null: %s\n", argv[1]);
+        for (unsigned int n = 0; n < sz; n++) 
+        {
+            free(data[n]);
+        }
+        free(data);
+        return 1;
+    }
+
+    for (unsigned int n = 0; n < sz; n++) 
+    {
+      
+        printf("%s\n", data[n]);
+    }
+
 }
