@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "util.h"
 #include "tree.h"
@@ -131,6 +132,16 @@ int main(int argc, char *argv[])
 
 
         if(sscanf(data[n], "%5s %lf%n", ticker, &value, &tracker) != 2)
+        {
+            continue;
+        }
+
+        if(value < 0.00 || value > 1000000.00)
+        {
+            continue;
+        }
+
+        if(invalidTicker(ticker))
         {
             continue;
         }
