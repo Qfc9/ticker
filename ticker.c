@@ -119,15 +119,13 @@ int main(int argc, char *argv[])
 
     for (unsigned int n = 0; n < sz; n++) 
     {
-        char foo[6];
-        double dd = 0.0;
-        char temp[64];
-        //snprintf(foo, 6, "%s ", data[n]);
-        sscanf(data[n], "%5s %lf %63s", foo, &dd, temp);
-        //sscanf(data[n], "%s %lf", dd);
-        //snprintf(dd, 10, "%lf ", data[n]);
-        //printf("%s %lf %s\n", foo, dd, temp);
-        tree_insert(&market, foo, temp, dollarsToCents(dd));
+        double value = 0.0;
+        char ticker[6];
+        char name[64];
+        strcpy(name, "\0");
+        strcpy(ticker, "\0");
+        sscanf(data[n], "%5s %lf %63s", ticker, &value, name);
+        tree_insert(&market, ticker, name, dollarsToCents(value));
     }
 
     tree_print(market);
