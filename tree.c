@@ -113,20 +113,36 @@ void tree_inorder(tree *t, void (*func)(char *, char *, size_t *))
 	recurse_inorder(t, func);
 }
 
-void treeAdd(tree *t, char *ticker, double value)
+void treeAdd(tree **t, char *ticker, double value)
 {
-	if(!t) {
+	if(!t || !*t) {
 		return;
 	}
 
-	tree *foundLocation = treeSearchForName(t, ticker);
+	size_t cents = dollarsToCents(value);
+	tree *foundLocation = treeSearchForName(*t, ticker);
+
 	if(foundLocation)
 	{
-		printf("FOUND, %s\n", ticker);
+		if(value < 0 && foundLocation->data->cents >= cents)
+		{
+			foundLocation->data->cents = foundLocation->data->cents - cents;
+		}
+		else if((foundLocation->data->cents + cents) <= 1000000)
+		{
+			foundLocation->data->cents = foundLocation->data->cents + cents;
+		}
+		else
+		{
+			return;
+		}
+		_rebalance(t);
 	}
 	else
 	{
-		printf("NO, %s\n", ticker);
+		char name[64];
+		strncpy(name, "\0", 64);
+		tree_insert(t, ticker, name, cents);
 	}
 
 }
@@ -138,7 +154,6 @@ static struct _tree *treeSearchForName(struct _tree *t, char *name)
 	}
 
 	struct _tree *result = NULL;
-	printf("SEARCH: %s\n", t->data->symbol);
 
 	if(strcmp(name, t->data->symbol) == 0)
 	{
