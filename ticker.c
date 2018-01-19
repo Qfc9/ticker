@@ -169,6 +169,10 @@ int main(int argc, char *argv[])
     tree_print(market);
     printf("\n");
 
+    char temp[6];
+    strcpy(temp, "AAA");
+    treeAdd(market, temp, 32.2);
+
     // Freeing mallocs
     for (unsigned int n = 0; n < sz; n++) 
     {

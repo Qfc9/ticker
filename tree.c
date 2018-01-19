@@ -26,6 +26,7 @@ static void _rebalance(struct _tree **a);
 static void _rotate_left(struct _tree **a);
 static void _rotate_right(struct _tree **a);
 static void recurse_inorder(struct _tree *n, void (*func)(char *, char *, size_t *));
+static struct _tree *treeSearchForName(struct _tree *t, char *name);
 static struct company *treeCreateStock(char *symbol, char *name, size_t price);
 
 tree *createTree(void)
@@ -105,7 +106,54 @@ void tree_disassemble(tree *a)
 
 void tree_inorder(tree *t, void (*func)(char *, char *, size_t *))
 {
+	if(!t) {
+		return;
+	}
+
 	recurse_inorder(t, func);
+}
+
+void treeAdd(tree *t, char *ticker, double value)
+{
+	if(!t) {
+		return;
+	}
+
+	tree *foundLocation = treeSearchForName(t, ticker);
+	if(foundLocation)
+	{
+		printf("FOUND, %s\n", ticker);
+	}
+	else
+	{
+		printf("NO, %s\n", ticker);
+	}
+
+}
+
+static struct _tree *treeSearchForName(struct _tree *t, char *name)
+{
+	if(!t) {
+		return NULL;
+	}
+
+	struct _tree *result = NULL;
+	printf("SEARCH: %s\n", t->data->symbol);
+
+	if(strcmp(name, t->data->symbol) == 0)
+	{
+		result = t;
+	}
+	else
+	{
+		result = treeSearchForName(t->left, name);
+		if(!result)
+		{
+			result = treeSearchForName(t->right, name);
+		}
+	}
+
+	return result;
 }
 
 // Change Underscore names
