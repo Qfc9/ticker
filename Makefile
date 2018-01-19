@@ -7,7 +7,7 @@ DEBUG = -DDEBUG -g
 
 BINS = ticker
 
-FILES = ticker.o tree.o
+FILES = ticker.o tree.o util.o
 
 all: build
 

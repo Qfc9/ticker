@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "util.h"
 #include "tree.h"
 
 struct company 
@@ -83,7 +84,7 @@ void tree_print(const tree *a)
 	}
 	tree_print(a->left);
 	printf("%s ", a->data->symbol);
-	printf("%zu ", a->data->cents);
+	printf("%lf ", centsToDollars(a->data->cents));
 	printf("%s \n", a->data->name);
 	tree_print(a->right);
 }
