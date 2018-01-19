@@ -1,4 +1,3 @@
-
 #define _XOPEN_SOURCE 500
 
 #include <math.h>
@@ -21,42 +20,12 @@ struct _tree
 	struct _tree *right;
 };
 
-/*
-static void _rebalance(tree **a);
+
+static void _rebalance(struct _tree **a);
 static void _rotate_left(struct _tree **a);
 static void _rotate_right(struct _tree **a);
-*/
-struct company *tree_stock_create(char *symbol, char *name, size_t price);
 static void recurse_inorder(struct _tree *n, void (*func)(char *, char *, size_t *));
-
-tree *tree_create(void)
-{
-	return NULL;
-}
-
-// Change Underscore names
-struct company *treeCreateStock(char *symbol, char *name, size_t price)
-{
-	struct company *new_stock = malloc(sizeof(*new_stock));
-	if(!new_stock)
-	{
-		return NULL;
-	}
-
-	new_stock->name = strdup(name);
-	if(!new_stock->name)
-	{
-		free(new_stock);
-		return NULL;
-	}
-
-	strncpy(new_stock->symbol, symbol, sizeof(new_stock->symbol) - 1);
-	new_stock->symbol[sizeof(new_stock->symbol)-1] = '\0';
-
-	new_stock->cents = price;
-
-	return new_stock;
-}
+static struct company *treeCreateStock(char *symbol, char *name, size_t price);
 
 size_t tree_height(tree *a)
 {
@@ -99,39 +68,73 @@ void tree_insert(tree **a, char *symbol, char *name, size_t price)
 		tree_insert(&t->right, symbol, name, price);
 	}
 
-	//_rebalance(a);
+	_rebalance(a);
 }
 
-/*
-static void _rotate_right(struct _tree **a)
+void tree_print(const tree *a)
 {
-	// TODO ABC
-	struct _tree* child = (*a)->left;
-	(*a)->left = child->right;
-	child->right = *a;
-	*a = child;
-}
-
-static void _rotate_left(struct _tree **a)
-{
-	// TODO ABC
-	struct _tree* child = (*a)->right;
-	(*a)->right = child->left;
-	child->left = *a;
-	*a = child;
-}
-
-// REDO
-struct company *get_max(struct _tree *node)
-{
-	if(node->right) {
-		return get_max(node->right);
-	} else {
-		return node->data;
+	if(!a) {
+		return;
 	}
+	tree_print(a->left);
+	printf("%zu ", a->data->cents);
+	tree_print(a->right);
 }
 
-static void _rebalance(tree **a)
+
+void tree_disassemble(tree *a)
+{
+	if(!a) {
+		return;
+	}
+
+	tree_disassemble(a->left);
+	tree_disassemble(a->right);
+	free(a->data->name);
+	free(a->data);
+	free(a);
+}
+
+void tree_inorder(tree *t, void (*func)(char *, char *, size_t *))
+{
+	recurse_inorder(t, func);
+}
+
+// Change Underscore names
+static struct company *treeCreateStock(char *symbol, char *name, size_t price)
+{
+	struct company *new_stock = malloc(sizeof(*new_stock));
+	if(!new_stock)
+	{
+		return NULL;
+	}
+
+	new_stock->name = strdup(name);
+	if(!new_stock->name)
+	{
+		free(new_stock);
+		return NULL;
+	}
+
+	strncpy(new_stock->symbol, symbol, sizeof(new_stock->symbol) - 1);
+	new_stock->symbol[sizeof(new_stock->symbol)-1] = '\0';
+
+	new_stock->cents = price;
+
+	return new_stock;
+}
+
+static void recurse_inorder(struct _tree *n, void (*func)(char *, char *, size_t *))
+{
+	if(!n) {
+		return;
+	}
+	recurse_inorder(n->left, func);
+	func(n->data->symbol, n->data->name, &n->data->cents);
+	recurse_inorder(n->right, func);
+}
+
+static void _rebalance(struct _tree **a)
 {
 	struct _tree *t = *a;
 	// If tree needs rebalancing, do so
@@ -158,84 +161,21 @@ static void _rebalance(tree **a)
 		_rotate_left(a);
 	}
 }
-*/
 
-// REDO
-// void tree_remove(tree **a, struct company value)
-// {
-// 	if(!a) {
-// 		return;
-// 	}
-// 	if(!*a) {
-// 		return;
-// 	}
-
-// 	struct _tree *t = *a;
-// 	if(fabs(t->data->cents - value->cents)) {
-// 		if(!t->left && !t->right) {
-// 			free(t);
-// 			*a = NULL;
-// 			return;
-// 		} else if(!t->left || !t->right) {
-// 			if(t->left) {
-// 				*a = t->left;
-// 			} else {
-// 				*a = t->right;
-// 			}
-// 			free(t);
-// 		} else {
-// 			struct company new_value = get_max(t->left);
-// 			t->data = new_value;
-// 			// TOTAL CHEATING
-// 			// But Liam said it was OK
-// 			tree_remove(a, new_value);
-// 		}
-
-// 	} else if(t->data < value) {
-// 		tree_remove(&t->right, value);
-// 	} else {
-// 		tree_remove(&t->left, value);
-// 	}
-
-// 	_rebalance(a);
-// }
-
-// REDO
-void tree_print(const tree *a)
+static void _rotate_right(struct _tree **a)
 {
-	if(!a) {
-		return;
-	}
-	tree_print(a->left);
-	printf("%lu ", a->data->cents);
-	tree_print(a->right);
+	// TODO ABC
+	struct _tree* child = (*a)->left;
+	(*a)->left = child->right;
+	child->right = *a;
+	*a = child;
 }
 
-
-void tree_disassemble(tree *a)
+static void _rotate_left(struct _tree **a)
 {
-	if(!a) {
-		return;
-	}
-
-	tree_disassemble(a->left);
-	tree_disassemble(a->right);
-	free(a->data->name);
-	free(a->data);
-	free(a);
-}
-
-void tree_inorder(tree *t, void (*func)(char *, char *, size_t *))
-{
-	recurse_inorder(t, func);
-}
-
-static void recurse_inorder(struct _tree *n, void (*func)(char *, char *, size_t *))
-{
-	if(!n) {
-		return;
-	}
-	recurse_inorder(n->left, func);
-	func(n->data->symbol, n->data->name, &n->data->cents);
-	recurse_inorder(n->right, func);
+	// TODO ABC
+	struct _tree* child = (*a)->right;
+	(*a)->right = child->left;
+	child->left = *a;
+	*a = child;
 }

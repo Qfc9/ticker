@@ -120,11 +120,19 @@ int main(int argc, char *argv[])
 
     char tick[6] = "TESTTT";
     char name[8] = "The Test";
-    tree *market = tree_create();
+    tree *market;
 
     tree_insert(&market, tick, name, 23123);
     tree_insert(&market, tick, name, 231);
+    tree_insert(&market, tick, name, 23123);
+    tree_insert(&market, tick, name, 231);
+    tree_insert(&market, tick, name, 23123);
+    tree_insert(&market, tick, name, 231);
+    tree_insert(&market, tick, name, 23123);
+    tree_insert(&market, tick, name, 231);
 
+    tree_print(market);
+    printf("\n");
 
     tree_disassemble(market);
 }
