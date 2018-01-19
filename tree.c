@@ -83,9 +83,9 @@ void tree_print(const tree *a)
 		return;
 	}
 	tree_print(a->left);
-	printf("%s ", a->data->symbol);
-	printf("%.2lf ", centsToDollars(a->data->cents));
-	printf("%s \n", a->data->name);
+	printf("%-5s", a->data->symbol);
+	printf("%- 11.2lf ", centsToDollars(a->data->cents));
+	printf("%s\n", a->data->name);
 	tree_print(a->right);
 }
 
