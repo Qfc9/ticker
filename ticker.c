@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 
-#include "avl.h"
+#include "tree.h"
 
 void theFunc(double *d)
 {
@@ -26,6 +26,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Unable to open the file: %s\n", argv[1]);
         return 1;
     }
+    
 
     size_t sz=0;
     size_t cap=4;
@@ -108,10 +109,22 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    // Freeing mallocs
     for (unsigned int n = 0; n < sz; n++) 
     {
-      
-        printf("%s\n", data[n]);
+        free(data[n]);
     }
 
+    free(data);
+    
+
+    char tick[6] = "TESTTT";
+    char name[8] = "The Test";
+    tree *market = tree_create();
+
+    tree_insert(&market, tick, name, 23123);
+    tree_insert(&market, tick, name, 231);
+
+
+    tree_disassemble(market);
 }

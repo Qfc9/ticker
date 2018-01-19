@@ -10,7 +10,9 @@ tree *tree_create(void);
 
 size_t tree_height(tree *a);
 
-void tree_insert(tree **a, double value);
+void tree_insert(tree **a, char *symbol, char *name, size_t price);
+
+struct company *treeCreateStock(char *symbol, char *name, size_t price);
 
 //void tree_remove(tree **a, struct company value);
 
