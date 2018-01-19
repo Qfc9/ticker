@@ -1,4 +1,4 @@
-#define _XOPEN_SOURCE 500
+#define _XOPEN_SOURCE 600
 
 #include <math.h>
 #include <stdio.h>
@@ -26,6 +26,11 @@ static void _rotate_left(struct _tree **a);
 static void _rotate_right(struct _tree **a);
 static void recurse_inorder(struct _tree *n, void (*func)(char *, char *, size_t *));
 static struct company *treeCreateStock(char *symbol, char *name, size_t price);
+
+tree *createTree(void)
+{
+	return NULL;
+}
 
 size_t tree_height(tree *a)
 {
@@ -77,7 +82,9 @@ void tree_print(const tree *a)
 		return;
 	}
 	tree_print(a->left);
+	printf("%s ", a->data->symbol);
 	printf("%zu ", a->data->cents);
+	printf("%s \n", a->data->name);
 	tree_print(a->right);
 }
 

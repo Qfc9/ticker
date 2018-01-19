@@ -1,5 +1,6 @@
 
 #include <stdio.h>
+#include <string.h>
 
 #include "tree.h"
 
@@ -109,30 +110,35 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    char tick[6];
+    strcpy(tick, "TESTTT");
+    char name[8];
+    strcpy(name, "The Test");
+
+    tree *market = createTree();
+
+    for (unsigned int n = 0; n < sz; n++) 
+    {
+        char foo[6];
+        double dd = 0.0;
+        char temp[64];
+        //snprintf(foo, 6, "%s ", data[n]);
+        sscanf(data[n], "%5s %lf %63s", foo, &dd, temp);
+        //sscanf(data[n], "%s %lf", dd);
+        //snprintf(dd, 10, "%lf ", data[n]);
+        //printf("%s %lf %s\n", foo, dd, temp);
+        tree_insert(&market, foo, temp, dd);
+    }
+
+    tree_print(market);
+    printf("\n");
+
     // Freeing mallocs
     for (unsigned int n = 0; n < sz; n++) 
     {
         free(data[n]);
     }
-
     free(data);
-    
-
-    char tick[6] = "TESTTT";
-    char name[8] = "The Test";
-    tree *market;
-
-    tree_insert(&market, tick, name, 23123);
-    tree_insert(&market, tick, name, 231);
-    tree_insert(&market, tick, name, 23123);
-    tree_insert(&market, tick, name, 231);
-    tree_insert(&market, tick, name, 23123);
-    tree_insert(&market, tick, name, 231);
-    tree_insert(&market, tick, name, 23123);
-    tree_insert(&market, tick, name, 231);
-
-    tree_print(market);
-    printf("\n");
 
     tree_disassemble(market);
 }
