@@ -26,6 +26,8 @@ static void _rebalance(struct _tree **a);
 static void _rotate_left(struct _tree **a);
 static void _rotate_right(struct _tree **a);
 static void recurse_inorder(struct _tree *n, void (*func)(char *, char *, size_t *));
+static void treeRemove(tree **a, char *ticker, size_t value);
+static struct _tree * treeGetMax(struct _tree *t);
 static struct _tree *treeSearchForName(struct _tree *t, char *name);
 static struct company *treeCreateStock(char *symbol, char *name, size_t price);
 
@@ -113,38 +115,105 @@ void tree_inorder(tree *t, void (*func)(char *, char *, size_t *))
 	recurse_inorder(t, func);
 }
 
-void treeAdd(tree **t, char *ticker, double value)
+void treeUpdate(tree **t, char *ticker, double value)
 {
-	if(!t || !*t) {
+	tree *result = treeSearchForName(*t, ticker);
+	
+	size_t covertedVal = dollarsToCents(value);
+	size_t newValue = 0;
+
+	if(!result)
+	{
+		char name[64];
+		strncpy(name, "\0", 63);
+		tree_insert(t, ticker, name, covertedVal);
 		return;
 	}
 
-	size_t cents = dollarsToCents(value);
-	tree *foundLocation = treeSearchForName(*t, ticker);
-
-	if(foundLocation)
+	if(value < 0 && covertedVal <= result->data->cents)
 	{
-		if(value < 0 && foundLocation->data->cents >= cents)
-		{
-			foundLocation->data->cents = foundLocation->data->cents - cents;
-		}
-		else if((foundLocation->data->cents + cents) <= 1000000)
-		{
-			foundLocation->data->cents = foundLocation->data->cents + cents;
-		}
-		else
-		{
-			return;
-		}
-		_rebalance(t);
+		newValue = result->data->cents - covertedVal;
+	}
+	else if((covertedVal + result->data->cents) <= 100000000)
+	{
+		newValue = result->data->cents + covertedVal;
 	}
 	else
 	{
-		char name[64];
-		strncpy(name, "\0", 64);
-		tree_insert(t, ticker, name, cents);
+		return;
 	}
 
+	char newTick[6];
+	char newName[64];
+	strncpy(newTick, result->data->symbol, 5);
+	strncpy(newName, result->data->name, 63);
+	newTick[5] = '\0';
+	newName[63] = '\0';
+
+	treeRemove(t, ticker, result->data->cents);
+	tree_insert(t, newTick, newName, newValue);
+}
+
+// return old cents
+static void treeRemove(tree **a, char *ticker, size_t value)
+{
+	if(!a) {
+		return;
+	}
+	if(!*a) {
+		return;
+	}
+
+	struct _tree *t = *a;
+
+	if((t->data->cents == value) && (strcmp(t->data->symbol, ticker) == 0)) {
+		if(!t->left && !t->right) {
+			free(t->data->name);
+			free(t->data);
+			free(t);
+
+			*a = NULL;
+			return;
+		} 
+		else if(!t->left || !t->right) {
+			if(t->left) {
+				*a = t->left;
+			} 
+			else {
+				*a = t->right;
+			}
+			free(t->data->name);
+			free(t->data);
+			free(t);
+		} 
+		else {
+			tree *newValue = treeGetMax(t->right);
+			free(t->data->name);
+			free(t->data);
+
+			struct company *newStock = treeCreateStock(newValue->data->symbol, newValue->data->name, newValue->data->cents);
+			t->data = newStock;
+
+			treeRemove(&t->right, newValue->data->symbol, newValue->data->cents);
+			_rebalance(a);
+		}
+
+	} 
+	else if(t->data->cents < value) {
+		treeRemove(&t->right, ticker, value);
+	} 
+	else {
+		treeRemove(&t->left, ticker, value);
+	}
+}
+
+static struct _tree * treeGetMax(struct _tree *t)
+{
+	if(t->right) {
+		return treeGetMax(t->right);
+	} else {
+		return t;
+	}
 }
 
 static struct _tree *treeSearchForName(struct _tree *t, char *name)

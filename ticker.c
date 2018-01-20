@@ -166,14 +166,19 @@ int main(int argc, char *argv[])
         tree_insert(&market, ticker, name, dollarsToCents(value));
     }
 
+    char temp[6];
+    strcpy(temp, "TTT");
+    treeUpdate(&market, temp, 10.3);
+    //strcpy(temp, "CATT");
+    //treeAdd(&market, temp, 34322.2);
+
     tree_print(market);
     printf("\n");
 
-    char temp[6];
-    strcpy(temp, "AAA");
-    treeAdd(&market, temp, 32.2);
-    strcpy(temp, "CAT");
-    treeAdd(&market, temp, 32.2);
+    strncpy(temp, "NKE", 6);
+    treeUpdate(&market, temp, -50.3);
+    strncpy(temp, "TTT", 6);
+    treeUpdate(&market, temp, 122.3);
 
     tree_print(market);
     printf("\n");
