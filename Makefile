@@ -22,7 +22,8 @@ debug:  $(FILES)
 profile: CFLAGS += -pg
 profile: CPPFLAGS += -pg
 profile: $(FILES)
-	gcc -o $(BINS) $(DECODE) $(CPPFLAGS) $(CFLAGS)
+	gcc -o $(BINS) $(FILES) $(CPPFLAGS) $(CFLAGS)
+	$(MAKE) clean
 
 build: $(FILES)
 	gcc -o $(BINS) $(FILES) $(CPPFLAGS) $(CFLAGS)
