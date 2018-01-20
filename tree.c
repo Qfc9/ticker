@@ -42,59 +42,60 @@ createTree (void)
 }
 
 // Extracts company info from a string
-void processCompany(tree **t, char *line)
+void
+processCompany (tree ** t, char *line)
 {
-    if (!t)
+  if (!t)
     {
       return;
     }
 
-	  double value = 0.0;
-	  char ticker[6];
-	  char name[64];
-	  char buf[64];
+  double value = 0.0;
+  char ticker[6];
+  char name[64];
+  char buf[64];
 
-	  int tracker = 0;
-	  int tempTracker = 0;
+  int tracker = 0;
+  int tempTracker = 0;
 
-	  strcpy (name, "\0");
-	  strcpy (buf, "\0");
-	  strcpy (ticker, "\0");
+  strcpy (name, "\0");
+  strcpy (buf, "\0");
+  strcpy (ticker, "\0");
 
 
-    // Getting ticker and money, tracking where it left off
-	  if (sscanf (line, "%5s %lf%n", ticker, &value, &tracker) != 2)
-	{
-	  return;
-	}
+  // Getting ticker and money, tracking where it left off
+  if (sscanf (line, "%5s %lf%n", ticker, &value, &tracker) != 2)
+    {
+      return;
+    }
 
   // Verifing the ticker
-	  if (invalidTicker (ticker))
-	{
-	  return;
-	}
+  if (invalidTicker (ticker))
+    {
+      return;
+    }
 
   // Continueing from the last marked spot, getting the company name
-	  while (sscanf (line + tracker, "%63s%n", buf, &tempTracker) > 0)
+  while (sscanf (line + tracker, "%63s%n", buf, &tempTracker) > 0)
+    {
+      // Making sure the name isn't to long
+      if ((strlen (buf) + strlen (name)) <= 63)
 	{
-    // Making sure the name isn't to long
-	  if ((strlen (buf) + strlen (name)) <= 63)
-	    {
-	      strcat (name, buf);
-	      strcat (name, " ");
-	      tracker += tempTracker;
+	  strcat (name, buf);
+	  strcat (name, " ");
+	  tracker += tempTracker;
 
-	    }
-	  else
-	    {
-	      strncat (name, buf, 63 - strlen (name));
-	      name[63] = '\0';
-	      break;
-	    }
 	}
+      else
+	{
+	  strncat (name, buf, 63 - strlen (name));
+	  name[63] = '\0';
+	  break;
+	}
+    }
 
   // Updating the tree with this new info
-	treeUpdate (t, ticker, name, value);
+  treeUpdate (t, ticker, name, value);
 }
 
 // Geting the height of a tree
@@ -120,26 +121,26 @@ treeInsert (tree ** a, char *symbol, char *name, size_t price)
       return;
     }
 
-    // If the tree is null make a root
+  // If the tree is null make a root
   if (!*a)
     {
       *a = calloc (1, sizeof (**a));
-    
+
       // Checking if calloc properly
       if (!*a)
-    	{
-    	  return;
-    	}
+	{
+	  return;
+	}
 
       // Making new company 
       struct company *newStock = treeCreateStock (symbol, name, price);
       // Checking if malloced properly
       if (!newStock)
-    	{
-    	  free (*a);
-    	  return;
-    	}
-          (*a)->data = newStock;
+	{
+	  free (*a);
+	  return;
+	}
+      (*a)->data = newStock;
       return;
     }
 
@@ -155,7 +156,7 @@ treeInsert (tree ** a, char *symbol, char *name, size_t price)
       treeInsert (&t->right, symbol, name, price);
     }
 
-    // Rebalancing the tree
+  // Rebalancing the tree
   _rebalance (a);
 }
 
@@ -200,7 +201,7 @@ treeUpdate (tree ** t, char *ticker, char *name, double value)
       return;
     }
 
-    // Searching the tree for a ticker
+  // Searching the tree for a ticker
   tree *result = treeSearchForName (*t, ticker);
 
   size_t covertedVal = dollarsToCents (value);
@@ -213,23 +214,23 @@ treeUpdate (tree ** t, char *ticker, char *name, double value)
       return;
     }
 
-    // Subing the new and old stock
+  // Subing the new and old stock
   if (value < 0 && covertedVal <= result->data->cents)
     {
       newValue = result->data->cents - covertedVal;
     }
-    // Adding the new and old stock
+  // Adding the new and old stock
   else if ((covertedVal + result->data->cents) <= 100000000)
     {
       newValue = result->data->cents + covertedVal;
     }
-    // Invalid stock information
+  // Invalid stock information
   else
     {
       return;
     }
 
-    // Coping stock info, originals wont last the remove
+  // Coping stock info, originals wont last the remove
   char newTick[6];
   char newName[64];
   strncpy (newTick, result->data->symbol, 5);
@@ -270,7 +271,7 @@ treeRemove (tree ** a, char *ticker, size_t value)
 	  *a = NULL;
 	  return;
 	}
-    // If one child
+      // If one child
       else if (!t->left || !t->right)
 	{
 	  if (t->left)
@@ -285,28 +286,28 @@ treeRemove (tree ** a, char *ticker, size_t value)
 	  free (t->data);
 	  free (t);
 	}
-    // If two children
+      // If two children
       else
 	{
-    // Get the greatest value 
+	  // Get the greatest value 
 	  tree *newValue = treeGetMax (t->left);
 	  free (t->data->name);
 	  free (t->data);
 
-    // Move greatest value to old stock position
+	  // Move greatest value to old stock position
 	  struct company *newStock =
 	    treeCreateStock (newValue->data->symbol, newValue->data->name,
 			     newValue->data->cents);
 	  t->data = newStock;
 
-    // Remove old stock and rebalance 
+	  // Remove old stock and rebalance 
 	  treeRemove (&t->left, newValue->data->symbol,
 		      newValue->data->cents);
 	  _rebalance (a);
 	}
 
     }
-    // Keep Searching
+  // Keep Searching
   else if (t->data->cents < value)
     {
       treeRemove (&t->right, ticker, value);
@@ -372,7 +373,7 @@ treeCreateStock (char *symbol, char *name, size_t price)
       return NULL;
     }
 
-    // Setting name
+  // Setting name
   newStock->name = strdup (name);
   // Checking
   if (!newStock->name)
@@ -381,7 +382,7 @@ treeCreateStock (char *symbol, char *name, size_t price)
       return NULL;
     }
 
-    // Setting symbol
+  // Setting symbol
   strncpy (newStock->symbol, symbol, sizeof (newStock->symbol) - 1);
   newStock->symbol[sizeof (newStock->symbol) - 1] = '\0';
 
@@ -434,7 +435,7 @@ _rotateRight (struct _tree **t)
     {
       return;
     }
-    else if (!*t)
+  else if (!*t)
     {
       return;
     }
