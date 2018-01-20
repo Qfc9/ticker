@@ -115,7 +115,7 @@ void tree_inorder(tree *t, void (*func)(char *, char *, size_t *))
 	recurse_inorder(t, func);
 }
 
-void treeUpdate(tree **t, char *ticker, double value)
+void treeUpdate(tree **t, char *ticker, char *name, double value)
 {
 	tree *result = treeSearchForName(*t, ticker);
 	
@@ -124,8 +124,6 @@ void treeUpdate(tree **t, char *ticker, double value)
 
 	if(!result)
 	{
-		char name[64];
-		strncpy(name, "\0", 63);
 		tree_insert(t, ticker, name, covertedVal);
 		return;
 	}
@@ -151,7 +149,7 @@ void treeUpdate(tree **t, char *ticker, double value)
 	newName[63] = '\0';
 
 	treeRemove(t, ticker, result->data->cents);
-	tree_insert(t, newTick, newName, newValue);
+	tree_insert(t, newTick, name, newValue);
 }
 
 // return old cents
@@ -187,14 +185,14 @@ static void treeRemove(tree **a, char *ticker, size_t value)
 			free(t);
 		} 
 		else {
-			tree *newValue = treeGetMax(t->right);
+			tree *newValue = treeGetMax(t->left);
 			free(t->data->name);
 			free(t->data);
 
 			struct company *newStock = treeCreateStock(newValue->data->symbol, newValue->data->name, newValue->data->cents);
 			t->data = newStock;
 
-			treeRemove(&t->right, newValue->data->symbol, newValue->data->cents);
+			treeRemove(&t->left, newValue->data->symbol, newValue->data->cents);
 			_rebalance(a);
 		}
 

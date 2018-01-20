@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
         }
 
         // Dynamicly allocating each line in the file as a string
-        while(buf != EOF)
+        while(buf != EOF && buf != 10)
         {
 
             storage[storageCounter] = buf;
@@ -140,6 +140,7 @@ int main(int argc, char *argv[])
 
         // Adding eaching line to an array
         storage[storageCounter] = '\0';
+        buf = getc(stdin);
         storageCounter = 0;
         inputData[inputSz++] = storage;
 
@@ -182,7 +183,7 @@ int main(int argc, char *argv[])
 
     // TODO Check for write $ amount
     // TODO Skip bad lines
-    for (unsigned int n = 0; n <fileSz; n++) 
+    for (unsigned int n = 0; n < fileSz; n++) 
     {
         double value = 0.0;
         char ticker[6];
@@ -232,22 +233,55 @@ int main(int argc, char *argv[])
         tree_insert(&market, ticker, name, dollarsToCents(value));
     }
 
-    
+    printf("%zu\n", inputSz);
+    for(unsigned int n = 0; n < inputSz; n++) 
+    {
+        double value = 0.0;
+        char ticker[6];
+        char name[64];
+        char buf[64];
 
-    char temp[6];
-    strcpy(temp, "TTT");
-    treeUpdate(&market, temp, 10.3);
-    //strcpy(temp, "CATT");
-    //treeAdd(&market, temp, 34322.2);
+        int tracker = 0;
+        int tempTracker = 0;
 
-    tree_print(market);
-    printf("\n");
+        strcpy(name, "\0");
+        strcpy(buf, "\0");
+        strcpy(ticker, "\0");
 
-    strncpy(temp, "NKE", 6);
-    treeUpdate(&market, temp, -50.3);
-    strncpy(temp, "TTT", 6);
-    treeUpdate(&market, temp, 122.3);
 
+        if(sscanf(inputData[n], "%5s %lf%n", ticker, &value, &tracker) != 2)
+        {
+            continue;
+        }
+
+        if(invalidTicker(ticker))
+        {
+            continue;
+        }
+
+        while(sscanf(inputData[n] + tracker, "%63s%n", buf, &tempTracker) > 0)
+        {
+            if((strlen(buf) + strlen(name)) <= 63)
+            {
+                strcat(name, buf);
+                strcat(name, " ");
+                tracker += tempTracker;
+
+            }
+            else
+            {
+                strncat(name, buf, 63 - strlen(name));
+                name[63] = '\0';
+                break;
+            }
+        }
+
+        printf("%s\n", inputData[n]);
+        printf("%s\n", ticker);
+        treeUpdate(&market, ticker, name, value);
+    }
+
+    printf("\n\n");
     tree_print(market);
     printf("\n");
 
