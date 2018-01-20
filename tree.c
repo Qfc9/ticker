@@ -39,6 +39,51 @@ createTree (void)
   return NULL;
 }
 
+void processCompany(tree **t, char *line)
+{
+	  double value = 0.0;
+	  char ticker[6];
+	  char name[64];
+	  char buf[64];
+
+	  int tracker = 0;
+	  int tempTracker = 0;
+
+	  strcpy (name, "\0");
+	  strcpy (buf, "\0");
+	  strcpy (ticker, "\0");
+
+
+	  if (sscanf (line, "%5s %lf%n", ticker, &value, &tracker) != 2)
+	{
+	  return;
+	}
+
+	  if (invalidTicker (ticker))
+	{
+	  return;
+	}
+
+	  while (sscanf (line + tracker, "%63s%n", buf, &tempTracker) > 0)
+	{
+	  if ((strlen (buf) + strlen (name)) <= 63)
+	    {
+	      strcat (name, buf);
+	      strcat (name, " ");
+	      tracker += tempTracker;
+
+	    }
+	  else
+	    {
+	      strncat (name, buf, 63 - strlen (name));
+	      name[63] = '\0';
+	      break;
+	    }
+	}
+
+	treeUpdate (t, ticker, name, value);
+}
+
 size_t
 tree_height (tree * a)
 {

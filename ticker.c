@@ -6,12 +6,7 @@
 #include "util.h"
 #include "tree.h"
 
-void
-theFunc (double *d)
-{
-  printf ("%lf\n", *d);
-}
-
+/* */
 int
 main (int argc, char *argv[])
 {
@@ -112,6 +107,8 @@ main (int argc, char *argv[])
 	}
     }
 
+    // Closing the read file
+  fclose (readFile);
   storageCounter = 0;
 
   buf = getc (stdin);
@@ -184,11 +181,6 @@ main (int argc, char *argv[])
 	}
     }
 
-
-
-  // Closing the read file
-  fclose (readFile);
-
   // Checking if file is null
   if (fileSz == 0)
     {
@@ -203,100 +195,14 @@ main (int argc, char *argv[])
 
   tree *market = createTree ();
 
-  // TODO Check for write $ amount
-  // TODO Skip bad lines
   for (unsigned int n = 0; n < fileSz; n++)
     {
-      double value = 0.0;
-      char ticker[6];
-      char name[64];
-      char buf[64];
-
-      int tracker = 0;
-      int tempTracker = 0;
-
-      strcpy (name, "\0");
-      strcpy (buf, "\0");
-      strcpy (ticker, "\0");
-
-
-      if (sscanf (fileData[n], "%5s %lf%n", ticker, &value, &tracker) != 2)
-	{
-	  continue;
-	}
-
-      if (value < 0.00 || value > 1000000.00)
-	{
-	  continue;
-	}
-
-      if (invalidTicker (ticker))
-	{
-	  continue;
-	}
-
-      while (sscanf (fileData[n] + tracker, "%63s%n", buf, &tempTracker) > 0)
-	{
-	  if ((strlen (buf) + strlen (name)) <= 63)
-	    {
-	      strcat (name, buf);
-	      strcat (name, " ");
-	      tracker += tempTracker;
-
-	    }
-	  else
-	    {
-	      strncat (name, buf, 63 - strlen (name));
-	      name[63] = '\0';
-	      break;
-	    }
-	}
-
-      tree_insert (&market, ticker, name, dollarsToCents (value));
+      processCompany(&market, fileData[n]);
     }
 
   for (unsigned int n = 0; n < inputSz; n++)
     {
-      double value = 0.0;
-      char ticker[6];
-      char name[64];
-      char buf[64];
-
-      int tracker = 0;
-      int tempTracker = 0;
-
-      strcpy (name, "\0");
-      strcpy (buf, "\0");
-      strcpy (ticker, "\0");
-
-
-      if (sscanf (inputData[n], "%5s %lf%n", ticker, &value, &tracker) != 2)
-	{
-	  continue;
-	}
-
-      if (invalidTicker (ticker))
-	{
-	  continue;
-	}
-
-      while (sscanf (inputData[n] + tracker, "%63s%n", buf, &tempTracker) > 0)
-	{
-	  if ((strlen (buf) + strlen (name)) <= 63)
-	    {
-	      strcat (name, buf);
-	      strcat (name, " ");
-	      tracker += tempTracker;
-
-	    }
-	  else
-	    {
-	      strncat (name, buf, 63 - strlen (name));
-	      name[63] = '\0';
-	      break;
-	    }
-	}
-      treeUpdate (&market, ticker, name, value);
+        processCompany(&market, inputData[n]);
     }
 
   printf ("\n");
