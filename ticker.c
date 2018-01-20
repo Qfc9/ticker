@@ -44,7 +44,7 @@ main (int argc, char *argv[])
       char *storage = malloc (tempStorageMax);
 
       // Dynamicly allocating each line in the file as a string
-      while (buf != EOF && buf != 10)
+      while (buf != EOF && buf != 10 && buf != 35)
 	{
 
 	  storage[storageCounter] = buf;
