@@ -233,7 +233,6 @@ int main(int argc, char *argv[])
         tree_insert(&market, ticker, name, dollarsToCents(value));
     }
 
-    printf("%zu\n", inputSz);
     for(unsigned int n = 0; n < inputSz; n++) 
     {
         double value = 0.0;
@@ -275,11 +274,10 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-        printf("%s\n", name );
         treeUpdate(&market, ticker, name, value);
     }
 
-    printf("\n\n");
+    printf("\n");
     tree_print(market);
     printf("\n");
 

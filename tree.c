@@ -61,7 +61,6 @@ void tree_insert(tree **a, char *symbol, char *name, size_t price)
 		struct company *newStock = treeCreateStock(symbol, name, price);
 		if(!newStock)
 		{
-			printf("FREE STOCK\n");
 			free(*a);
 			return;
 		}
@@ -86,8 +85,9 @@ void tree_print(const tree *a)
 		return;
 	}
 	tree_print(a->left);
-	printf("%-5s", a->data->symbol);
-	printf("%- 11.2lf ", centsToDollars(a->data->cents));
+	printf("%s ", a->data->symbol);
+	printf("%zu.", (a->data->cents/100));
+	printf("%02zu ", (a->data->cents%100));
 	printf("%s\n", a->data->name);
 	tree_print(a->right);
 }
