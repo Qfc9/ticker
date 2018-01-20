@@ -3,33 +3,36 @@
 #include <ctype.h>
 #include "util.h"
 
-size_t dollarsToCents(double dollars)
+size_t
+dollarsToCents (double dollars)
 {
-    size_t cents = 0;
-    cents = dollars * 100;
-    return cents;
+  size_t cents = 0;
+  cents = dollars * 100;
+  return cents;
 }
 
-bool invalidTicker(char *ticker)
+bool
+invalidTicker (char *ticker)
 {
-    for(unsigned int i = 0; strlen(ticker) > i; i++)
+  for (unsigned int i = 0; strlen (ticker) > i; i++)
     {
-        if(isalnum(ticker[i]) == 0)
-        {
-            if(ticker[i] != '.' && ticker[i] != '-' && ticker[i] != '/')
-            {
-                return true;
-            }
-        }
+      if (isalnum (ticker[i]) == 0)
+	{
+	  if (ticker[i] != '.' && ticker[i] != '-' && ticker[i] != '/')
+	    {
+	      return true;
+	    }
+	}
     }
-    return false;
+  return false;
 }
 
-void getCharClean(void)
+void
+getCharClean (void)
 {
-    int clearChar = getchar();
-    while ((clearChar != '\n') && (clearChar != EOF))
+  int clearChar = getchar ();
+  while ((clearChar != '\n') && (clearChar != EOF))
     {
-        clearChar = getchar();
+      clearChar = getchar ();
     }
 }
