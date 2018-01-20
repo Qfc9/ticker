@@ -6,10 +6,11 @@
 #include "util.h"
 #include "tree.h"
 
-/* */
+// This is my main function
 int
 main (int argc, char *argv[])
 {
+  // Initializing Variables
   FILE *readFile;
 
   int tempStorageMax = 64;
@@ -38,6 +39,7 @@ main (int argc, char *argv[])
       return 1;
     }
 
+  // Getting all the data in the file given
   char buf = fgetc (readFile);
   while (buf != EOF)
     {
@@ -107,10 +109,26 @@ main (int argc, char *argv[])
 	}
     }
 
-    // Closing the read file
+  // Closing the read file
   fclose (readFile);
+
+  // Checking if file is null
+  if (fileSz == 0)
+    {
+      fprintf (stderr, "File is null: %s\n", argv[1]);
+      for (unsigned int n = 0; n < fileSz; n++)
+	{
+	  free (fileData[n]);
+	}
+      free (fileData);
+      free (inputData);
+      return 1;
+    }
+
+  // Reseting the counter just in case
   storageCounter = 0;
 
+  // Getting data from stdin
   buf = getc (stdin);
   while (buf != EOF)
     {
@@ -181,47 +199,40 @@ main (int argc, char *argv[])
 	}
     }
 
-  // Checking if file is null
-  if (fileSz == 0)
-    {
-      fprintf (stderr, "File is null: %s\n", argv[1]);
-      for (unsigned int n = 0; n < fileSz; n++)
-	{
-	  free (fileData[n]);
-	}
-      free (fileData);
-      return 1;
-    }
-
+  // Creating the market tree
   tree *market = createTree ();
 
+  // Adding all the values from the file into the tree
   for (unsigned int n = 0; n < fileSz; n++)
     {
-      processCompany(&market, fileData[n]);
+      processCompany (&market, fileData[n]);
     }
 
+  // Adding all the values from STDIN into the tree
   for (unsigned int n = 0; n < inputSz; n++)
     {
-        processCompany(&market, inputData[n]);
+      processCompany (&market, inputData[n]);
     }
 
+  // Printing the market
   printf ("\n");
   tree_print (market);
   printf ("\n");
 
-  // Freeing mallocs
+  // Freeing file storage mallocs
   for (unsigned int n = 0; n < fileSz; n++)
     {
       free (fileData[n]);
     }
   free (fileData);
 
-  // Freeing mallocs
+  // Freeing input mallocs
   for (unsigned int n = 0; n < inputSz; n++)
     {
       free (inputData[n]);
     }
   free (inputData);
 
+  // Freeing the tree
   tree_disassemble (market);
 }
