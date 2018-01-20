@@ -149,7 +149,7 @@ void treeUpdate(tree **t, char *ticker, char *name, double value)
 	newName[63] = '\0';
 
 	treeRemove(t, ticker, result->data->cents);
-	tree_insert(t, newTick, name, newValue);
+	tree_insert(t, newTick, newName, newValue);
 }
 
 // return old cents

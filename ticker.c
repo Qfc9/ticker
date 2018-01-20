@@ -275,9 +275,7 @@ int main(int argc, char *argv[])
                 break;
             }
         }
-
-        printf("%s\n", inputData[n]);
-        printf("%s\n", ticker);
+        printf("%s\n", name );
         treeUpdate(&market, ticker, name, value);
     }
 
