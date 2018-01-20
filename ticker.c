@@ -216,7 +216,7 @@ main (int argc, char *argv[])
 
   // Printing the market
   printf ("\n");
-  tree_print (market);
+  treePrint (market);
   printf ("\n");
 
   // Freeing file storage mallocs
@@ -234,5 +234,5 @@ main (int argc, char *argv[])
   free (inputData);
 
   // Freeing the tree
-  tree_disassemble (market);
+  treeDisassemble (market);
 }
