@@ -1,0 +1,39 @@
+.\" Manpage for ticker.
+.\" Contact Elijah Harmon to correct errors or typos.
+.TH ticker 1 "20 January 2018" "1.0" "User Commands"
+.SH NAME
+ticker \- outputs currect stock prices based on data given
+.SH SYNOPSIS
+USAGE: ./ticker STOCK_FILE
+.SH DESCRIPTION
+Ticker needs a stock file given to it through comamand line args. Then ticker will wait for input via stdin. This input is to be the changes in the stocks.
+
+.B COMMAND LINE ARG FIlE EXAMPLE:
+
+AAPL 87.95 Apple Inc.
+.br
+PWC 107.00 PricewaterhouseCoopers
+.br
+GOOG 730.96 Alphabet, Inc.
+.br
+AGFS 5.89
+.br
+NKE 61.20 Nike, Inc.
+
+.B STDIN EXAMPLE:
+
+AAPL -7.52 Apple Inc.
+.br
+NKE +3.26
+.br
+AGFS -6.01
+.br
+WMT -7.82 Wal-Stores Inc.
+.br
+AMZN +6.55 Amazon, Inc.
+
+
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Elijah Harmon

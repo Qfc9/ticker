@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include "util.h"
 
+// Converts a double to a size_t
 size_t
 dollarsToCents (double dollars)
 {
@@ -11,6 +12,7 @@ dollarsToCents (double dollars)
   return cents;
 }
 
+// Returns if the string is a valid ticker
 bool
 invalidTicker (char *ticker)
 {
@@ -27,6 +29,7 @@ invalidTicker (char *ticker)
   return false;
 }
 
+// Removes extra chars at the end of stdin
 void
 getCharClean (void)
 {
