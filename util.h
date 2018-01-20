@@ -7,5 +7,6 @@
 double centsToDollars(size_t cents);
 size_t dollarsToCents(double dollars);
 bool invalidTicker(char *ticker);
+void getCharClean(void);
 
 #endif

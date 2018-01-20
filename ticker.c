@@ -1,3 +1,4 @@
+#define _XOPEN_SOURCE 700
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -14,6 +15,17 @@ int main(int argc, char *argv[])
 {
     FILE *readFile;
 
+    int tempStorageMax = 64;
+    int storageCounter = 0;
+
+    size_t fileSz=0;
+    size_t fileCap=4;
+    char **fileData = malloc(fileCap * sizeof(*fileData));
+
+    size_t inputSz=0;
+    size_t inputCap=4;
+    char **inputData = malloc(inputCap * sizeof(*inputData));
+
     // Checking for valid amount for args
     if(argc != 2)
     {
@@ -28,41 +40,34 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Unable to open the file: %s\n", argv[1]);
         return 1;
     }
-    
-
-    size_t sz=0;
-    size_t cap=4;
-    char **data = malloc(cap * sizeof(*data));
-    int storageMax = 64;
-    int counter = 0;
 
     char buf = fgetc(readFile);
     while(buf != EOF)
     {
-        char *storage = malloc(storageMax);
+        char *storage = malloc(tempStorageMax);
 
         // Dynamicly allocating each line in the file as a string
         while(buf != EOF && buf != 10)
         {
 
-            storage[counter] = buf;
+            storage[storageCounter] = buf;
 
-            counter++;
+            storageCounter++;
             buf = fgetc(readFile);
 
             // Allocating more memory for the line
-            if (counter >= storageMax - 1) {
-                storageMax *= 2;
-                void *tmp_data = realloc(storage, storageMax * sizeof(storage));
-                if (tmp_data) {
-                    storage = tmp_data;
+            if (storageCounter >= tempStorageMax - 1) {
+                tempStorageMax *= 2;
+                void *tmp_fileData = realloc(storage, tempStorageMax * sizeof(storage));
+                if (tmp_fileData) {
+                    storage = tmp_fileData;
                 } else {
                      // Freeing mallocs
-                    for (unsigned int n = 0; n < sz; n++) 
+                    for (unsigned int n = 0; n < fileSz; n++) 
                     {
-                        free(data[n]);
+                        free(fileData[n]);
                     }
-                    free(data);
+                    free(fileData);
                     // Closing opened files
                     fclose(readFile);
                     return 1;
@@ -71,23 +76,23 @@ int main(int argc, char *argv[])
         }
 
         // Adding eaching line to an array
-        storage[counter] = '\0';
+        storage[storageCounter] = '\0';
         buf = fgetc(readFile);
-        counter = 0;
-        data[sz++] = storage;
+        storageCounter = 0;
+        fileData[fileSz++] = storage;
         // Allocating more memory for the array for lines
-        if (sz >= cap) {
-            cap *= 2;
-            void *tmp_data = realloc(data, cap * sizeof(*data));
-            if (tmp_data) {
-                data = tmp_data;
+        if (fileSz >= fileCap) {
+            fileCap *= 2;
+            void *tmp_fileData = realloc(fileData, fileCap * sizeof(*fileData));
+            if (tmp_fileData) {
+                fileData = tmp_fileData;
             } else {
                  // Freeing mallocs
-                for (unsigned int n = 0; n < sz; n++) 
+                for (unsigned int n = 0; n < fileSz; n++) 
                 {
-                    free(data[n]);
+                    free(fileData[n]);
                 }
-                free(data);
+                free(fileData);
                 // Closing opened files
                 fclose(readFile);
                 return 1;
@@ -95,28 +100,89 @@ int main(int argc, char *argv[])
         }
     }
 
+    storageCounter = 0;
+
+    buf = getc(stdin);
+    while(buf != EOF)
+    {
+        char *storage = malloc(tempStorageMax);
+        if(!storage)
+        {
+            continue;
+        }
+
+        // Dynamicly allocating each line in the file as a string
+        while(buf != EOF)
+        {
+
+            storage[storageCounter] = buf;
+
+            storageCounter++;
+            buf = getc(stdin);
+
+            // Allocating more memory for the line
+            if (storageCounter >= tempStorageMax - 1) {
+                tempStorageMax *= 2;
+                void *tmp_fileData = realloc(storage, tempStorageMax * sizeof(storage));
+                if (tmp_fileData) {
+                    storage = tmp_fileData;
+                } else {
+                     // Freeing mallocs
+                    for (unsigned int n = 0; n < inputSz; n++) 
+                    {
+                        free(inputData[n]);
+                    }
+                    free(inputData);
+                    return 1;
+                }
+            }
+        }
+
+        // Adding eaching line to an array
+        storage[storageCounter] = '\0';
+        storageCounter = 0;
+        inputData[inputSz++] = storage;
+
+        // Allocating more memory for the array for lines
+        if (inputSz >= inputCap) {
+            inputCap *= 2;
+            void *tmp_fileData = realloc(inputData, inputCap * sizeof(*inputData));
+            if (tmp_fileData) {
+                inputData = tmp_fileData;
+            } else {
+                 // Freeing mallocs
+                for (unsigned int n = 0; n < inputSz; n++) 
+                {
+                    free(inputData[n]);
+                }
+                free(inputData);
+                return 1;
+            }
+        }
+    }
+
+
 
     // Closing the read file
     fclose(readFile);
 
     // Checking if file is null
-    if(sz == 0)
+    if(fileSz == 0)
     {
         fprintf(stderr, "File is null: %s\n", argv[1]);
-        for (unsigned int n = 0; n < sz; n++) 
+        for (unsigned int n = 0; n < fileSz; n++) 
         {
-            free(data[n]);
+            free(fileData[n]);
         }
-        free(data);
+        free(fileData);
         return 1;
     }
-
 
     tree *market = createTree();
 
     // TODO Check for write $ amount
     // TODO Skip bad lines
-    for (unsigned int n = 0; n < sz; n++) 
+    for (unsigned int n = 0; n <fileSz; n++) 
     {
         double value = 0.0;
         char ticker[6];
@@ -131,7 +197,7 @@ int main(int argc, char *argv[])
         strcpy(ticker, "\0");
 
 
-        if(sscanf(data[n], "%5s %lf%n", ticker, &value, &tracker) != 2)
+        if(sscanf(fileData[n], "%5s %lf%n", ticker, &value, &tracker) != 2)
         {
             continue;
         }
@@ -146,7 +212,7 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        while(sscanf(data[n] + tracker, "%63s%n", buf, &tempTracker) > 0)
+        while(sscanf(fileData[n] + tracker, "%63s%n", buf, &tempTracker) > 0)
         {
             if((strlen(buf) + strlen(name)) <= 63)
             {
@@ -166,6 +232,8 @@ int main(int argc, char *argv[])
         tree_insert(&market, ticker, name, dollarsToCents(value));
     }
 
+    
+
     char temp[6];
     strcpy(temp, "TTT");
     treeUpdate(&market, temp, 10.3);
@@ -184,11 +252,18 @@ int main(int argc, char *argv[])
     printf("\n");
 
     // Freeing mallocs
-    for (unsigned int n = 0; n < sz; n++) 
+    for (unsigned int n = 0; n < fileSz; n++) 
     {
-        free(data[n]);
+        free(fileData[n]);
     }
-    free(data);
+    free(fileData);
+
+    // Freeing mallocs
+    for (unsigned int n = 0; n < inputSz; n++) 
+    {
+        free(inputData[n]);
+    }
+    free(inputData);
 
     tree_disassemble(market);
 }

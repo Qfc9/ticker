@@ -32,3 +32,12 @@ bool invalidTicker(char *ticker)
     }
     return false;
 }
+
+void getCharClean(void)
+{
+    int clearChar = getchar();
+    while ((clearChar != '\n') && (clearChar != EOF))
+    {
+        clearChar = getchar();
+    }
+}
